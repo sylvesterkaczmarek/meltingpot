@@ -1,0 +1,56 @@
+name: Exact-commit regression validation
+on:
+  push:
+    branches:
+      - 'validation/population-restarts-and-badge-states-20260929'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12']
+        fix: ['population', 'badges']
+    env:
+      TF_CPP_MIN_LOG_LEVEL: '2'
+      TF_NUM_INTEROP_THREADS: '1'
+      TF_NUM_INTRAOP_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      SDL_VIDEODRIVER: dummy
+      SDL_AUDIODRIVER: dummy
+      JAX_PLATFORMS: cpu
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Resolve source commit
+        id: source
+        env:
+          FIX: ${{ matrix.fix }}
+        run: python -c 'import json,os; c=json.load(open("validation/cases.json"))[os.environ["FIX"]]; open(os.environ["GITHUB_OUTPUT"],"a").write("sha="+c["head"]+"\n")'
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: sylvesterkaczmarek/meltingpot
+          ref: ${{ steps.source.outputs.sha }}
+          path: work
+          fetch-depth: 0
+      - name: Install test dependencies
+        run: |
+          python -m pip install -r validation/requirements.txt
+          if [ '${{ matrix.python }}' = '3.11' ]; then python -m pip install pytype==2024.10.11; fi
+      - name: Verify regression and original-code controls
+        env:
+          FIX: ${{ matrix.fix }}
+        run: python validation/verify.py "$FIX" work evidence
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: evidence-${{ matrix.fix }}-${{ matrix.python }}
+          path: evidence
+          retention-days: 14

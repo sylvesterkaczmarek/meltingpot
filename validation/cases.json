@@ -1,0 +1,28 @@
+{
+  "population": {
+    "repo": "google-deepmind/meltingpot",
+    "base_branch": "main",
+    "base": "1b4239b54303ed593e2335c219f453300b5885dd",
+    "name": "population",
+    "branch": "fix/population-reward-free-restarts-20260929",
+    "source": "meltingpot/utils/scenarios/population.py",
+    "test": "meltingpot/utils/scenarios/population_restart_test.py",
+    "issue_url": "https://github.com/google-deepmind/meltingpot/issues/417",
+    "issue": 417,
+    "head": "13b689c97427cc6f59f0a0eb9b7dcff6100b9fd9",
+    "title": "Preserve absent rewards when distributing population timesteps"
+  },
+  "badges": {
+    "repo": "google-deepmind/meltingpot",
+    "base_branch": "main",
+    "base": "1b4239b54303ed593e2335c219f453300b5885dd",
+    "name": "badges",
+    "branch": "fix/badge-sprite-state-references-20260929",
+    "source": "meltingpot/utils/substrates/game_object_utils.py",
+    "test": "meltingpot/utils/substrates/avatar_badge_states_test.py",
+    "issue_url": "https://github.com/google-deepmind/meltingpot/issues/418",
+    "issue": 418,
+    "head": "e2ecaaa3bc520f40d7f69542617f991103863d9a",
+    "title": "Rename badge sprites in all matching state configurations"
+  }
+}
